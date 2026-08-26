@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+message: "If you use this project, please cite it using these metadata."
+title: "Reproducible Stata Word Tables"
+type: software
+authors:
+  - family-names: Silverman
+    given-names: Steve
+version: 0.1.0
+repository-code: "https://github.com/silver-manatee/reproducible-stata-word-tables"
+url: "https://github.com/silver-manatee/reproducible-stata-word-tables"
+license: MIT
+abstract: >-
+  A transparent Stata starter project that rebuilds a related set of formatted
+  Microsoft Word tables from one parameter block. It includes synthetic data,
+  logs, assertions, and an extension guide.
+keywords:
+  - Stata
+  - reproducible reporting
+  - Microsoft Word
+  - research software
+  - publication tables

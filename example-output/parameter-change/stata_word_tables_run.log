@@ -1,0 +1,423 @@
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  REPOSITORY_ROOT/logs/stata_wo
+> rd_tables_run.log
+  log type:  text
+ opened on:  24 Aug 2026, 17:25:37
+
+. 
+. **# Validate parameters before analysis -------------------------------------
+> ---
+. 
+. assert inrange(`category_cut', 1, 5)
+
+. assert inlist(`apply_exclusion', 0, 1)
+
+. 
+. display as text "REPORT PARAMETERS"
+REPORT PARAMETERS
+
+. display as text "  category_cut      = `category_cut'"
+  category_cut      = 3
+
+. display as text "  apply_exclusion   = `apply_exclusion'"
+  apply_exclusion   = 1
+
+. display as text "  model_outcome     = `model_outcome'"
+  model_outcome     = outcome_log
+
+. display as text "  covariates        = `covariates'"
+  covariates        = age_years i.group_indicator i.exposure_group
+
+. display as text "  cluster_variable  = `cluster_variable'"
+  cluster_variable  = cluster_id
+
+. display as text "  random_seed       = `random_seed'"
+  random_seed       = 20260822
+
+. 
+. use "data/synthetic_study.dta", clear
+
+. isid participant_id
+
+. 
+. confirm numeric variable `model_outcome'
+
+. confirm numeric variable `cluster_variable'
+
+. assert !missing(`model_outcome', `cluster_variable')
+
+. 
+. **# Apply the parameters once -----------------------------------------------
+> ---
+. 
+. recode burden_count (`category_cut'/max = `category_cut'), ///
+>     generate(burden_category)
+(33 differences between burden_count and burden_category)
+
+. 
+. capture label drop burdenlabel
+
+. forvalues category = 0/`category_cut' {
+  2.     if `category' == `category_cut' {
+  3.         label define burdenlabel `category' "`category'+", add
+  4.     }
+  5.     else {
+  6.         label define burdenlabel `category' "`category'", add
+  7.     }
+  8. }
+
+. label values burden_category burdenlabel
+
+. label variable burden_category "Burden category"
+
+. 
+. if `apply_exclusion' {
+.     drop if exclusion_flag
+(27 observations deleted)
+. }
+
+. 
+. assert _N > 0
+
+. assert inrange(burden_category, 0, `category_cut')
+
+. 
+. count if burden_category == `category_cut'
+  85
+
+. local top_category_n = r(N)
+
+. assert `top_category_n' > 0
+
+. 
+. local analysis_n = _N
+
+. display as result "VERIFIED: analysis sample N = `analysis_n'"
+VERIFIED: analysis sample N = 373
+
+. display as result "VERIFIED: top category (`category_cut'+) N = " ///
+>     `top_category_n'
+VERIFIED: top category (3+) N = 85
+
+. display as result "VERIFIED: parameter and data assertions passed."
+VERIFIED: parameter and data assertions passed.
+
+. 
+. **# Begin the Word document -------------------------------------------------
+> ---
+. 
+. putdocx clear
+
+. putdocx begin, pagesize(letter) margin(top, 1) margin(bottom, 1) ///
+>     margin(left, 1) margin(right, 1) font("Arial", 10)
+
+. 
+. putdocx paragraph, style(Title)
+
+. putdocx text ("Reproducible Stata Word Tables: demo")
+
+. 
+. putdocx paragraph
+
+. putdocx text ("Synthetic data only. "), bold
+
+. putdocx text ("Every table below was regenerated from one parameter block. ")
+
+. putdocx text ("category_cut = `category_cut'; ")
+
+. putdocx text ("exclusions applied = `apply_exclusion'; ")
+
+. putdocx text ("analysis N = `analysis_n'.")
+
+. 
+. **# Table 1: sample characteristics -----------------------------------------
+> ---
+. 
+. dtable age_years i.group_indicator i.exposure_group outcome_score, ///
+>     by(burden_category) ///
+>     continuous(, statistics(mean sd)) ///
+>     factor(, statistics(fvpercent fvfrequency)) ///
+>     nformat(%4.2f mean sd fvpercent) ///
+>     nformat(%4.0f fvfrequency) ///
+>     sformat("(%s)" sd fvfrequency) ///
+>     sformat("%s%%" fvpercent) ///
+>     title(Table 1. Sample characteristics by burden category) ///
+>     nosample
+
+Table 1. Sample characteristics by burden category
+---------------------------------------------------------------------------------------------
+                                                   Burden category                           
+                              0             1             2             3+          Total    
+---------------------------------------------------------------------------------------------
+Age, years              51.04 (13.17) 48.77 (13.08) 51.71 (11.60) 49.52 (11.50) 50.17 (12.39)
+Study group                                                                                  
+  Group A                 48.68% (37)   40.00% (46)   53.61% (52)   52.94% (45)  48.26% (180)
+  Group B                 51.32% (39)   60.00% (69)   46.39% (45)   47.06% (40)  51.74% (193)
+Exposure group                                                                               
+  Low                     23.68% (18)   30.43% (35)   35.05% (34)   34.12% (29)  31.10% (116)
+  Moderate                44.74% (34)   28.70% (33)   29.90% (29)   29.41% (25)  32.44% (121)
+  High                    31.58% (24)   40.87% (47)   35.05% (34)   36.47% (31)  36.46% (136)
+Synthetic outcome score   5.17 (1.67)   5.93 (2.32)   6.72 (2.77)   7.74 (3.07)   6.39 (2.67)
+---------------------------------------------------------------------------------------------
+
+. collect style putdocx, width(100%) layout(autofitcontents) halign(center)
+
+. putdocx collect
+(collection DTable posted to putdocx)
+
+. 
+. **# Table 2: primary model --------------------------------------------------
+> ----
+. 
+. putdocx pagebreak
+
+. regress `model_outcome' i.burden_category `covariates', ///
+>     vce(cluster `cluster_variable')
+
+Linear regression                               Number of obs     =        373
+                                                F(6, 7)           =          .
+                                                Prob > F          =          .
+                                                R-squared         =     0.1581
+                                                Root MSE          =     .37174
+
+                             (Std. err. adjusted for 8 clusters in cluster_id)
+------------------------------------------------------------------------------
+             |               Robust
+ outcome_log | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+burden_cat~y |
+          1  |   .1132538   .0486962     2.33   0.053    -.0018944    .2284019
+          2  |   .2313699   .0726328     3.19   0.015     .0596206    .4031191
+         3+  |   .3904085   .0367699    10.62   0.000     .3034615    .4773555
+             |
+   age_years |   .0048743   .0015661     3.11   0.017     .0011711    .0085774
+             |
+group_indi~r |
+    Group B  |   .1200628   .0303902     3.95   0.006     .0482014    .1919242
+             |
+exposure_g~p |
+   Moderate  |    .009833   .0474501     0.21   0.842    -.1023686    .1220347
+       High  |   .0460138    .034226     1.34   0.221    -.0349179    .1269455
+             |
+       _cons |   1.263571   .0606885    20.82   0.000     1.120065    1.407076
+------------------------------------------------------------------------------
+
+. matrix primary_results = r(table)
+
+. 
+. etable, title(Table 2. Primary model) column(dvlabel) ///
+>     cstat(_r_b, nformat(%4.2f)) ///
+>     cstat(_r_ci, nformat(%4.2f) sformat("[%s]") cidelimiter(", ")) ///
+>     cstat(_r_p, nformat(%5.3f)) ///
+>     note(Bold p-values indicate p < 0.05.) ///
+>     mstat(N)
+
+Table 2. Primary model
+--------------------------------------------------
+                       Log synthetic outcome score
+--------------------------------------------------
+Burden category                                   
+  1                                           0.11
+                                     [-0.00, 0.23]
+                                             0.053
+  2                                           0.23
+                                      [0.06, 0.40]
+                                             0.015
+  3+                                          0.39
+                                      [0.30, 0.48]
+                                             0.000
+Age, years                                    0.00
+                                      [0.00, 0.01]
+                                             0.017
+Study group                                       
+  Group B                                     0.12
+                                      [0.05, 0.19]
+                                             0.006
+Exposure group                                    
+  Moderate                                    0.01
+                                     [-0.10, 0.12]
+                                             0.842
+  High                                        0.05
+                                     [-0.03, 0.13]
+                                             0.221
+Intercept                                     1.26
+                                      [1.12, 1.41]
+                                             0.000
+Number of observations                         373
+--------------------------------------------------
+Bold p-values indicate p < 0.05.
+
+. 
+. collect style cell result[_r_p], minimum(0.001, label("<0.001"))
+
+. local primary_columns : colnames primary_results
+
+. foreach column of local primary_columns {
+  2.     scalar pvalue = primary_results[rownumb(primary_results, "pvalue"), //
+> /
+>         colnumb(primary_results, "`column'")]
+  3.     if !missing(pvalue) & pvalue < 0.05 {
+  4.         collect style cell result[_r_p]#colname[`column'], font(, bold)
+  5.     }
+  6. }
+
+. collect style putdocx, width(75%) layout(autofitcontents) halign(center)
+
+. putdocx collect
+(collection ETable posted to putdocx)
+
+. 
+. **# Table 3: secondary model ------------------------------------------------
+> ----
+. 
+. putdocx pagebreak
+
+. regress outcome_score i.burden_category `covariates', ///
+>     vce(cluster `cluster_variable')
+
+Linear regression                               Number of obs     =        373
+                                                F(6, 7)           =          .
+                                                Prob > F          =          .
+                                                R-squared         =     0.1684
+                                                Root MSE          =     2.4607
+
+                             (Std. err. adjusted for 8 clusters in cluster_id)
+------------------------------------------------------------------------------
+             |               Robust
+outcome_sc~e | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+burden_cat~y |
+          1  |   .7639587   .2775744     2.75   0.028     .1075995    1.420318
+          2  |   1.575402   .4578239     3.44   0.011     .4928205    2.657984
+         3+  |   2.664282   .1943977    13.71   0.000     2.204604    3.123959
+             |
+   age_years |   .0360783   .0106287     3.39   0.012     .0109455    .0612112
+             |
+group_indi~r |
+    Group B  |   .8162924   .2163782     3.77   0.007     .3046393    1.327946
+             |
+exposure_g~p |
+   Moderate  |   .0674348    .314363     0.21   0.836    -.6759156    .8107853
+       High  |   .1956677   .2787683     0.70   0.505    -.4635145    .8548499
+             |
+       _cons |   2.815185   .4081812     6.90   0.000      1.84999     3.78038
+------------------------------------------------------------------------------
+
+. matrix secondary_results = r(table)
+
+. 
+. etable, title(Table 3. Secondary model: untransformed outcome) ///
+>     column(dvlabel) ///
+>     cstat(_r_b, nformat(%4.2f)) ///
+>     cstat(_r_ci, nformat(%4.2f) sformat("[%s]") cidelimiter(", ")) ///
+>     cstat(_r_p, nformat(%5.3f)) ///
+>     note(Bold p-values indicate p < 0.05.) ///
+>     mstat(N)
+
+Table 3. Secondary model: untransformed outcome
+----------------------------------------------
+                       Synthetic outcome score
+----------------------------------------------
+Burden category                               
+  1                                       0.76
+                                  [0.11, 1.42]
+                                         0.028
+  2                                       1.58
+                                  [0.49, 2.66]
+                                         0.011
+  3+                                      2.66
+                                  [2.20, 3.12]
+                                         0.000
+Age, years                                0.04
+                                  [0.01, 0.06]
+                                         0.012
+Study group                                   
+  Group B                                 0.82
+                                  [0.30, 1.33]
+                                         0.007
+Exposure group                                
+  Moderate                                0.07
+                                 [-0.68, 0.81]
+                                         0.836
+  High                                    0.20
+                                 [-0.46, 0.85]
+                                         0.505
+Intercept                                 2.82
+                                  [1.85, 3.78]
+                                         0.000
+Number of observations                     373
+----------------------------------------------
+Bold p-values indicate p < 0.05.
+
+. 
+. collect style cell result[_r_p], minimum(0.001, label("<0.001"))
+
+. local secondary_columns : colnames secondary_results
+
+. foreach column of local secondary_columns {
+  2.     scalar pvalue = secondary_results[rownumb(secondary_results, "pvalue")
+> , ///
+>         colnumb(secondary_results, "`column'")]
+  3.     if !missing(pvalue) & pvalue < 0.05 {
+  4.         collect style cell result[_r_p]#colname[`column'], font(, bold)
+  5.     }
+  6. }
+
+. collect style putdocx, width(75%) layout(autofitcontents) halign(center)
+
+. putdocx collect
+(collection ETable posted to putdocx)
+
+. 
+. **# Save the document and write the short receipt ---------------------------
+> ----
+. 
+. putdocx save "output/stata_word_tables.docx", replace
+successfully replaced "REPOSITORY_ROOT/out
+> put/stata_word_tables.docx"
+
+. confirm file "output/stata_word_tables.docx"
+
+. 
+. file open receipt using "logs/verification_receipt.txt", ///
+>     write text replace
+
+. file write receipt "REPRODUCIBLE STATA WORD TABLES - VERIFICATION RECEIPT" _n
+
+. file write receipt "Synthetic data only" _n
+
+. file write receipt "random_seed=`random_seed'" _n
+
+. file write receipt "category_cut=`category_cut'" _n
+
+. file write receipt "apply_exclusion=`apply_exclusion'" _n
+
+. file write receipt "analysis_n=`analysis_n'" _n
+
+. file write receipt "top_category_n=`top_category_n'" _n
+
+. file write receipt "assertions=PASSED" _n
+
+. file write receipt "word_document=output/stata_word_tables.docx" _n
+
+. file close receipt
+
+. 
+. display as result "VERIFIED: output/stata_word_tables.docx written."
+VERIFIED: output/stata_word_tables.docx written.
+
+. display as result "VERIFIED: logs/verification_receipt.txt written."
+VERIFIED: logs/verification_receipt.txt written.
+
+. display as result "REPORT BUILD COMPLETE."
+REPORT BUILD COMPLETE.
+
+. 
+. log close
+      name:  <unnamed>
+       log:  REPOSITORY_ROOT/logs/stata_wo
+> rd_tables_run.log
+  log type:  text
+ closed on:  24 Aug 2026, 17:25:38
+-------------------------------------------------------------------------------

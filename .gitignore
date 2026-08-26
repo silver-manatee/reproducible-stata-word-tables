@@ -1,0 +1,12 @@
+.DS_Store
+*.smcl
+/master.log
+
+# Working outputs are regenerated locally. Verified examples are tracked under
+# example-output/ and screenshots are tracked under docs/images/.
+logs/*.log
+logs/*.txt
+output/*.docx
+
+!logs/.gitkeep
+!output/.gitkeep

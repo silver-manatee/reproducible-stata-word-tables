@@ -1,0 +1,9 @@
+REPRODUCIBLE STATA WORD TABLES - VERIFICATION RECEIPT
+Synthetic data only
+random_seed=20260822
+category_cut=2
+apply_exclusion=1
+analysis_n=373
+top_category_n=182
+assertions=PASSED
+word_document=output/stata_word_tables.docx

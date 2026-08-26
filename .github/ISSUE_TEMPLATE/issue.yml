@@ -1,0 +1,23 @@
+name: Report a problem
+description: Something in the demo is broken or unclear.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This is a demonstration project rather than a supported product. I keep the demo working and I read issues when I can, but I can't promise a quick reply.
+
+        When you report a problem, use synthetic data only. Don't attach confidential data, restricted manuscripts, credentials, or unpublished research logic.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+      description: Tell me what you ran, what you expected, and what happened instead. If the log shows an error, include the first one.
+    validations:
+      required: true
+  - type: input
+    id: setup
+    attributes:
+      label: Stata version and operating system
+      placeholder: "Stata/MP 18.0 on macOS"
+    validations:
+      required: false

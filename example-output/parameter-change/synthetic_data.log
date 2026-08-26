@@ -3,7 +3,7 @@
        log:  REPOSITORY_ROOT/logs/syntheti
 > c_data.log
   log type:  text
- opened on:  24 Aug 2026, 17:25:37
+ opened on:  26 Aug 2026, 15:32:41
 
 . 
 . display as text "Synthetic-data seed: `random_seed'"
@@ -108,5 +108,5 @@ VERIFIED: all synthetic-data assertions passed.
        log:  REPOSITORY_ROOT/logs/syntheti
 > c_data.log
   log type:  text
- closed on:  24 Aug 2026, 17:25:37
+ closed on:  26 Aug 2026, 15:32:41
 -------------------------------------------------------------------------------

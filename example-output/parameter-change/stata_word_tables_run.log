@@ -3,15 +3,25 @@
        log:  REPOSITORY_ROOT/logs/stata_wo
 > rd_tables_run.log
   log type:  text
- opened on:  24 Aug 2026, 17:25:37
+ opened on:  26 Aug 2026, 15:32:41
 
 . 
 . **# Validate parameters before analysis -------------------------------------
 > ---
 . 
-. assert inrange(`category_cut', 1, 5)
+. * Explicit if-checks rather than -assert-: no data are in memory yet, and
+. * -assert- is satisfied vacuously when _N is zero.
+. if !inlist(`category_cut', 1, 2, 3, 4, 5) {
+.     display as error "category_cut must be an integer from 1 to 5. Current va
+> lue: `category_cut'."
+.     error 198
+. }
 
-. assert inlist(`apply_exclusion', 0, 1)
+. if !inlist(`apply_exclusion', 0, 1) {
+.     display as error "apply_exclusion must be 0 or 1. Current value: `apply_e
+> xclusion'."
+.     error 198
+. }
 
 . 
 . display as text "REPORT PARAMETERS"
@@ -419,5 +429,5 @@ REPORT BUILD COMPLETE.
        log:  REPOSITORY_ROOT/logs/stata_wo
 > rd_tables_run.log
   log type:  text
- closed on:  24 Aug 2026, 17:25:38
+ closed on:  26 Aug 2026, 15:32:42
 -------------------------------------------------------------------------------

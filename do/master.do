@@ -155,6 +155,7 @@ dtable age_years i.group_indicator i.exposure_group outcome_score, ///
     sformat("(%s)" sd fvfrequency) ///
     sformat("%s%%" fvpercent) ///
     title(Table 1. Sample characteristics by burden category) ///
+    note(Values are mean (standard deviation) for continuous variables and percent (count) for categorical variables.) ///
     nosample
 collect style putdocx, width(100%) layout(autofitcontents) halign(center)
 putdocx collect
@@ -170,6 +171,9 @@ etable, title(Table 2. Primary model) column(dvlabel) ///
     cstat(_r_b, nformat(%4.2f)) ///
     cstat(_r_ci, nformat(%4.2f) sformat("[%s]") cidelimiter(", ")) ///
     cstat(_r_p, nformat(%5.3f)) ///
+    note(Cells show the coefficient, the 95% confidence interval in brackets, and the p-value.) ///
+    note(Standard errors are clustered by study cluster.) ///
+    note(Reference categories: burden category 0, Group A, and Low exposure.) ///
     note(Bold p-values indicate p < 0.05.) ///
     mstat(N)
 
@@ -198,6 +202,9 @@ etable, title(Table 3. Secondary model: untransformed outcome) ///
     cstat(_r_b, nformat(%4.2f)) ///
     cstat(_r_ci, nformat(%4.2f) sformat("[%s]") cidelimiter(", ")) ///
     cstat(_r_p, nformat(%5.3f)) ///
+    note(Cells show the coefficient, the 95% confidence interval in brackets, and the p-value.) ///
+    note(Standard errors are clustered by study cluster.) ///
+    note(Reference categories: burden category 0, Group A, and Low exposure.) ///
     note(Bold p-values indicate p < 0.05.) ///
     mstat(N)
 

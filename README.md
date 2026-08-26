@@ -32,6 +32,8 @@ Running `do/master.do` rebuilds:
 
 All values are synthetic.
 
+Each run regenerates `data/synthetic_study.dta` in place, so git shows the file as modified afterward. The data values are unchanged; only Stata's save timestamp differs.
+
 ## Requirements
 
 - Stata 18 or newer. The table machinery is built-in `dtable`, `etable`, `collect`, and `putdocx`, with no community-contributed packages.

@@ -3,7 +3,7 @@
        log:  REPOSITORY_ROOT/logs/stata_wo
 > rd_tables_run.log
   log type:  text
- opened on:  26 Aug 2026, 16:26:05
+ opened on:  26 Aug 2026, 18:28:07
 
 . 
 . * Remove the previous run's report and receipt first. A run that stops on an
@@ -160,6 +160,8 @@ VERIFIED: parameter and data assertions passed.
 >     sformat("(%s)" sd fvfrequency) ///
 >     sformat("%s%%" fvpercent) ///
 >     title(Table 1. Sample characteristics by burden category) ///
+>     note(Values are mean (standard deviation) for continuous variables and pe
+> rcent (count) for categorical variables.) ///
 >     nosample
 
 Table 1. Sample characteristics by burden category
@@ -177,6 +179,8 @@ Exposure group
   High                    31.58% (24)   40.87% (47)   35.05% (34)   36.47% (31)  36.46% (136)
 Synthetic outcome score   5.17 (1.67)   5.93 (2.32)   6.72 (2.77)   7.74 (3.07)   6.39 (2.67)
 ---------------------------------------------------------------------------------------------
+Values are mean (standard deviation) for continuous variables and percent (count) for
+categorical variables.
 
 . collect style putdocx, width(100%) layout(autofitcontents) halign(center)
 
@@ -227,6 +231,11 @@ exposure_g~p |
 >     cstat(_r_b, nformat(%4.2f)) ///
 >     cstat(_r_ci, nformat(%4.2f) sformat("[%s]") cidelimiter(", ")) ///
 >     cstat(_r_p, nformat(%5.3f)) ///
+>     note(Cells show the coefficient, the 95% confidence interval in brackets,
+>  and the p-value.) ///
+>     note(Standard errors are clustered by study cluster.) ///
+>     note(Reference categories: burden category 0, Group A, and Low exposure.)
+>  ///
 >     note(Bold p-values indicate p < 0.05.) ///
 >     mstat(N)
 
@@ -263,6 +272,11 @@ Intercept                                     1.26
                                              0.000
 Number of observations                         373
 --------------------------------------------------
+Cells show the coefficient, the 95% confidence
+interval in brackets, and the p-value.
+Standard errors are clustered by study cluster.
+Reference categories: burden category 0, Group A,
+and Low exposure.
 Bold p-values indicate p < 0.05.
 
 . 
@@ -331,6 +345,11 @@ exposure_g~p |
 >     cstat(_r_b, nformat(%4.2f)) ///
 >     cstat(_r_ci, nformat(%4.2f) sformat("[%s]") cidelimiter(", ")) ///
 >     cstat(_r_p, nformat(%5.3f)) ///
+>     note(Cells show the coefficient, the 95% confidence interval in brackets,
+>  and the p-value.) ///
+>     note(Standard errors are clustered by study cluster.) ///
+>     note(Reference categories: burden category 0, Group A, and Low exposure.)
+>  ///
 >     note(Bold p-values indicate p < 0.05.) ///
 >     mstat(N)
 
@@ -367,6 +386,12 @@ Intercept                                 2.82
                                          0.000
 Number of observations                     373
 ----------------------------------------------
+Cells show the coefficient, the 95% confidence
+interval in brackets, and the p-value.
+Standard errors are clustered by study
+cluster.
+Reference categories: burden category 0, Group
+A, and Low exposure.
 Bold p-values indicate p < 0.05.
 
 . 
@@ -445,5 +470,5 @@ REPORT BUILD COMPLETE.
        log:  REPOSITORY_ROOT/logs/stata_wo
 > rd_tables_run.log
   log type:  text
- closed on:  26 Aug 2026, 16:26:06
+ closed on:  26 Aug 2026, 18:28:08
 -------------------------------------------------------------------------------

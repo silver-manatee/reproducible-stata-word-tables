@@ -3,7 +3,14 @@
        log:  REPOSITORY_ROOT/logs/stata_wo
 > rd_tables_run.log
   log type:  text
- opened on:  26 Aug 2026, 15:32:41
+ opened on:  26 Aug 2026, 16:26:05
+
+. 
+. * Remove the previous run's report and receipt first. A run that stops on an
+. * error then leaves no stale Word file and no receipt that still says PASSED.
+. capture erase "output/stata_word_tables.docx"
+
+. capture erase "logs/verification_receipt.txt"
 
 . 
 . **# Validate parameters before analysis -------------------------------------
@@ -267,7 +274,9 @@ Bold p-values indicate p < 0.05.
   2.     scalar pvalue = primary_results[rownumb(primary_results, "pvalue"), //
 > /
 >         colnumb(primary_results, "`column'")]
-  3.     if !missing(pvalue) & pvalue < 0.05 {
+  3.     * scalar() keeps a dataset variable named pvalue from shadowing the sc
+> alar.
+.     if !missing(scalar(pvalue)) & scalar(pvalue) < 0.05 {
   4.         collect style cell result[_r_p]#colname[`column'], font(, bold)
   5.     }
   6. }
@@ -369,7 +378,7 @@ Bold p-values indicate p < 0.05.
   2.     scalar pvalue = secondary_results[rownumb(secondary_results, "pvalue")
 > , ///
 >         colnumb(secondary_results, "`column'")]
-  3.     if !missing(pvalue) & pvalue < 0.05 {
+  3.     if !missing(scalar(pvalue)) & scalar(pvalue) < 0.05 {
   4.         collect style cell result[_r_p]#colname[`column'], font(, bold)
   5.     }
   6. }
@@ -384,14 +393,15 @@ Bold p-values indicate p < 0.05.
 > ----
 . 
 . putdocx save "output/stata_word_tables.docx", replace
-successfully replaced "REPOSITORY_ROOT/out
-> put/stata_word_tables.docx"
+successfully created "REPOSITORY_ROOT/outp
+> ut/stata_word_tables.docx"
 
 . confirm file "output/stata_word_tables.docx"
 
 . 
 . file open receipt using "logs/verification_receipt.txt", ///
 >     write text replace
+(file logs/verification_receipt.txt not found)
 
 . file write receipt "REPRODUCIBLE STATA WORD TABLES - VERIFICATION RECEIPT" _n
 
@@ -402,6 +412,12 @@ successfully replaced "REPOSITORY_ROOT/out
 . file write receipt "category_cut=`category_cut'" _n
 
 . file write receipt "apply_exclusion=`apply_exclusion'" _n
+
+. file write receipt "model_outcome=`model_outcome'" _n
+
+. file write receipt "covariates=`covariates'" _n
+
+. file write receipt "cluster_variable=`cluster_variable'" _n
 
 . file write receipt "analysis_n=`analysis_n'" _n
 
@@ -429,5 +445,5 @@ REPORT BUILD COMPLETE.
        log:  REPOSITORY_ROOT/logs/stata_wo
 > rd_tables_run.log
   log type:  text
- closed on:  26 Aug 2026, 15:32:42
+ closed on:  26 Aug 2026, 16:26:06
 -------------------------------------------------------------------------------

@@ -61,6 +61,11 @@ do "do/make_synthetic_data.do" `"`project_dir'"' "`random_seed'"
 capture log close
 log using "logs/stata_word_tables_run.log", text replace
 
+* Remove the previous run's report and receipt first. A run that stops on an
+* error then leaves no stale Word file and no receipt that still says PASSED.
+capture erase "output/stata_word_tables.docx"
+capture erase "logs/verification_receipt.txt"
+
 **# Validate parameters before analysis ----------------------------------------
 
 * Explicit if-checks rather than -assert-: no data are in memory yet, and
@@ -173,7 +178,8 @@ local primary_columns : colnames primary_results
 foreach column of local primary_columns {
     scalar pvalue = primary_results[rownumb(primary_results, "pvalue"), ///
         colnumb(primary_results, "`column'")]
-    if !missing(pvalue) & pvalue < 0.05 {
+    * scalar() keeps a dataset variable named pvalue from shadowing the scalar.
+    if !missing(scalar(pvalue)) & scalar(pvalue) < 0.05 {
         collect style cell result[_r_p]#colname[`column'], font(, bold)
     }
 }
@@ -200,7 +206,7 @@ local secondary_columns : colnames secondary_results
 foreach column of local secondary_columns {
     scalar pvalue = secondary_results[rownumb(secondary_results, "pvalue"), ///
         colnumb(secondary_results, "`column'")]
-    if !missing(pvalue) & pvalue < 0.05 {
+    if !missing(scalar(pvalue)) & scalar(pvalue) < 0.05 {
         collect style cell result[_r_p]#colname[`column'], font(, bold)
     }
 }
@@ -219,6 +225,9 @@ file write receipt "Synthetic data only" _n
 file write receipt "random_seed=`random_seed'" _n
 file write receipt "category_cut=`category_cut'" _n
 file write receipt "apply_exclusion=`apply_exclusion'" _n
+file write receipt "model_outcome=`model_outcome'" _n
+file write receipt "covariates=`covariates'" _n
+file write receipt "cluster_variable=`cluster_variable'" _n
 file write receipt "analysis_n=`analysis_n'" _n
 file write receipt "top_category_n=`top_category_n'" _n
 file write receipt "assertions=PASSED" _n

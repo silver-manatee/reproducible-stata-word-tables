@@ -3,7 +3,14 @@
        log:  REPOSITORY_ROOT/logs/stata_wo
 > rd_tables_run.log
   log type:  text
- opened on:  26 Aug 2026, 15:32:39
+ opened on:  26 Aug 2026, 16:25:43
+
+. 
+. * Remove the previous run's report and receipt first. A run that stops on an
+. * error then leaves no stale Word file and no receipt that still says PASSED.
+. capture erase "output/stata_word_tables.docx"
+
+. capture erase "logs/verification_receipt.txt"
 
 . 
 . **# Validate parameters before analysis -------------------------------------
@@ -263,7 +270,9 @@ Bold p-values indicate p < 0.05.
   2.     scalar pvalue = primary_results[rownumb(primary_results, "pvalue"), //
 > /
 >         colnumb(primary_results, "`column'")]
-  3.     if !missing(pvalue) & pvalue < 0.05 {
+  3.     * scalar() keeps a dataset variable named pvalue from shadowing the sc
+> alar.
+.     if !missing(scalar(pvalue)) & scalar(pvalue) < 0.05 {
   4.         collect style cell result[_r_p]#colname[`column'], font(, bold)
   5.     }
   6. }
@@ -361,7 +370,7 @@ Bold p-values indicate p < 0.05.
   2.     scalar pvalue = secondary_results[rownumb(secondary_results, "pvalue")
 > , ///
 >         colnumb(secondary_results, "`column'")]
-  3.     if !missing(pvalue) & pvalue < 0.05 {
+  3.     if !missing(scalar(pvalue)) & scalar(pvalue) < 0.05 {
   4.         collect style cell result[_r_p]#colname[`column'], font(, bold)
   5.     }
   6. }
@@ -396,6 +405,12 @@ successfully created "REPOSITORY_ROOT/outp
 
 . file write receipt "apply_exclusion=`apply_exclusion'" _n
 
+. file write receipt "model_outcome=`model_outcome'" _n
+
+. file write receipt "covariates=`covariates'" _n
+
+. file write receipt "cluster_variable=`cluster_variable'" _n
+
 . file write receipt "analysis_n=`analysis_n'" _n
 
 . file write receipt "top_category_n=`top_category_n'" _n
@@ -422,5 +437,5 @@ REPORT BUILD COMPLETE.
        log:  REPOSITORY_ROOT/logs/stata_wo
 > rd_tables_run.log
   log type:  text
- closed on:  26 Aug 2026, 15:32:40
+ closed on:  26 Aug 2026, 16:25:44
 -------------------------------------------------------------------------------

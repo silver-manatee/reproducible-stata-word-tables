@@ -18,6 +18,9 @@ Synthetic data only
 random_seed=20260822
 category_cut=2
 apply_exclusion=1
+model_outcome=outcome_log
+covariates=age_years i.group_indicator i.exposure_group
+cluster_variable=cluster_id
 analysis_n=373
 top_category_n=182
 assertions=PASSED
@@ -49,6 +52,9 @@ Synthetic data only
 random_seed=20260822
 category_cut=3
 apply_exclusion=1
+model_outcome=outcome_log
+covariates=age_years i.group_indicator i.exposure_group
+cluster_variable=cluster_id
 analysis_n=373
 top_category_n=85
 assertions=PASSED

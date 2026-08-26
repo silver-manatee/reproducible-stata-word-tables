@@ -47,7 +47,9 @@ All values are synthetic.
 do "do/master.do"
 ```
 
-If Stata starts somewhere else, open `do/master.do` and put the repository's full path in `project_dir`.
+If Stata starts somewhere else, you need two edits. Put the repository's full path in `project_dir` inside `do/master.do`, and run the file by its full path as well, for example `do "C:/projects/reproducible-stata-word-tables/do/master.do"`. The full path in the run command lets Stata find the file, and `project_dir` sends the outputs to the repository.
+
+Before you run it in a live session, know that the file starts with `clear all`, closes any log you have open, and leaves the working directory set to the repository folder.
 
 When the run finishes, open `output/stata_word_tables.docx`. The Results window should end with `REPORT BUILD COMPLETE.`
 
@@ -83,7 +85,7 @@ R and Quarto already treat parameterized reporting as a native workflow. This pr
 
 This project came out of my AI coaching work. I help individuals and organizations put AI to work in their daily routines, and one of my clients is a medical statistician at a state university. Working alongside her, I noticed she was living the exact problem this README opens with, and I was sure there was a better way. Gathering detailed context from our sessions, I worked with Claude Code to build a solution. What started as a fix for her workflow turned out to be a pattern other Stata researchers can adapt.
 
-This public version keeps the general workflow and removes the private research context. It contains synthetic data only, with no private code, research variables, unpublished methods, or implied endorsement. I also squashed the development history into a single commit for the same reason.
+This public version keeps the general workflow and removes the private research context. It contains synthetic data only, with no private code, research variables, unpublished methods, or implied endorsement. I also squashed the earlier development history into a single initial commit for the same reason.
 
 ## Limits
 

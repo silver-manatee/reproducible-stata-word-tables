@@ -3,12 +3,24 @@
        log:  REPOSITORY_ROOT/logs/stata_wo
 > rd_tables_run.log
   log type:  text
- opened on:  26 Aug 2026, 18:28:07
+ opened on:  27 Aug 2026, 14:51:43
 
 . 
 . * Remove the previous run's report and receipt first. A run that stops on an
 . * error then leaves no stale Word file and no receipt that still says PASSED.
 . capture erase "output/stata_word_tables.docx"
+
+. capture confirm file "output/stata_word_tables.docx"
+
+. if _rc == 0 {
+.     * The old document survived the erase, usually because it is open in Word
+> .
+.     * Stop now: a stale report is the file people actually open.
+.     display as error "Could not remove the previous output/stata_word_tables.
+> docx."
+.     display as error "Close the file if it is open in Word, then rerun."
+.     error 608
+. }
 
 . capture erase "logs/verification_receipt.txt"
 
@@ -224,6 +236,11 @@ exposure_g~p |
        _cons |   1.263571   .0606885    20.82   0.000     1.120065    1.407076
 ------------------------------------------------------------------------------
 
+. * With real data, missing covariate values can silently drop records from a
+. * regression, so the documented analysis N would no longer describe this mode
+> l.
+. assert e(N) == `analysis_n'
+
 . matrix primary_results = r(table)
 
 . 
@@ -336,6 +353,8 @@ exposure_g~p |
              |
        _cons |   2.815185   .4081812     6.90   0.000      1.84999     3.78038
 ------------------------------------------------------------------------------
+
+. assert e(N) == `analysis_n'
 
 . matrix secondary_results = r(table)
 
@@ -470,5 +489,5 @@ REPORT BUILD COMPLETE.
        log:  REPOSITORY_ROOT/logs/stata_wo
 > rd_tables_run.log
   log type:  text
- closed on:  26 Aug 2026, 18:28:08
+ closed on:  27 Aug 2026, 14:51:44
 -------------------------------------------------------------------------------

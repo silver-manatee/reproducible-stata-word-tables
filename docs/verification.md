@@ -1,6 +1,6 @@
 # Verification record
 
-This page records what I tested. I verified the project locally on 2026-08-22 and reran it after the 2026-08-24 name change, using StataNow/MP 19.5. On 2026-08-26 I reran both passes and refreshed the shipped logs, so they show the current parameter checks in `do/master.do`. Both do-files pin `version 18`, and the project uses only commands available in Stata 18.
+This page records what I tested. I verified the project locally on 2026-08-22 and reran it after the 2026-08-24 name change, using StataNow/MP 19.5. On 2026-08-27 I reran both passes and refreshed the shipped logs after hardening the failure paths, so they show the current checks in `do/master.do`: the wrong-folder check, the stale-file guard, and the model sample-size assertions. Both do-files pin `version 18`, and the project uses only commands available in Stata 18.
 
 ## Baseline run
 

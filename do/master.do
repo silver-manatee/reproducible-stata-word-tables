@@ -11,12 +11,13 @@
 * MAKES: data/synthetic_study.dta         - regenerated synthetic input
 *        output/stata_word_tables.docx     - Tables 1-3 in Microsoft Word
 *        logs/stata_word_tables_run.log    - full Stata run log
+*        logs/synthetic_data.log           - data-generation log
 *        logs/verification_receipt.txt    - short parameter and check receipt
 *
 * DEMO: change category_cut from 2 to 3. Run the whole file again. The group
 * columns and model terms update together across all three tables.
 *
-* Last updated: 2026-08-25
+* Last updated: 2026-08-27
 *===============================================================================
 version 18
 clear all
@@ -51,6 +52,17 @@ local random_seed       20260822
 *-------------------------------------------------------------------------------
 
 cd `"`project_dir'"'
+
+* Confirm the project files are reachable before creating any folders, so a
+* run started in the wrong directory fails cleanly instead of leaving empty
+* data/, output/, and logs/ folders behind.
+capture confirm file "do/make_synthetic_data.do"
+if _rc {
+    display as error "Project files not found in `c(pwd)'."
+    display as error "Start Stata in the repository folder, or set project_dir in the PARAMETERS block to the repository's full path."
+    error 601
+}
+
 capture mkdir data
 capture mkdir output
 capture mkdir logs
@@ -64,6 +76,14 @@ log using "logs/stata_word_tables_run.log", text replace
 * Remove the previous run's report and receipt first. A run that stops on an
 * error then leaves no stale Word file and no receipt that still says PASSED.
 capture erase "output/stata_word_tables.docx"
+capture confirm file "output/stata_word_tables.docx"
+if _rc == 0 {
+    * The old document survived the erase, usually because it is open in Word.
+    * Stop now: a stale report is the file people actually open.
+    display as error "Could not remove the previous output/stata_word_tables.docx."
+    display as error "Close the file if it is open in Word, then rerun."
+    error 608
+}
 capture erase "logs/verification_receipt.txt"
 
 **# Validate parameters before analysis ----------------------------------------
@@ -165,6 +185,9 @@ putdocx collect
 putdocx pagebreak
 regress `model_outcome' i.burden_category `covariates', ///
     vce(cluster `cluster_variable')
+* With real data, missing covariate values can silently drop records from a
+* regression, so the documented analysis N would no longer describe this model.
+assert e(N) == `analysis_n'
 matrix primary_results = r(table)
 
 etable, title(Table 2. Primary model) column(dvlabel) ///
@@ -195,6 +218,7 @@ putdocx collect
 putdocx pagebreak
 regress outcome_score i.burden_category `covariates', ///
     vce(cluster `cluster_variable')
+assert e(N) == `analysis_n'
 matrix secondary_results = r(table)
 
 etable, title(Table 3. Secondary model: untransformed outcome) ///

@@ -32,7 +32,7 @@ Running `do/master.do` rebuilds:
 
 All values are synthetic.
 
-Each run regenerates `data/synthetic_study.dta` in place, so git shows the file as modified afterward. The data values are unchanged; only Stata's save timestamp differs.
+Each run regenerates `data/synthetic_study.dta` in place, so git shows the file as modified afterward. The data values are unchanged, but the rewritten file is not byte-identical: Stata's save timestamp and some internal padding bytes shift between runs, so a checksum will differ. The Word document behaves the same way, with identical content and changing internal timestamps. This project reproduces numbers, not checksums.
 
 ## Requirements
 
@@ -54,6 +54,8 @@ If Stata starts somewhere else, you need two edits. Put the repository's full pa
 Before you run it in a live session, know that the file starts with `clear all`, closes any log you have open, and leaves the working directory set to the repository folder.
 
 When the run finishes, open `output/stata_word_tables.docx`. The Results window should end with `REPORT BUILD COMPLETE.`
+
+Running Stata from a shell instead of the GUI? The exact batch command appears in [docs/verification.md](docs/verification.md). In batch mode there is no Results window; the `REPORT BUILD COMPLETE.` line appears at the end of `master.log`, which Stata writes to the repository root (git ignores it).
 
 ## Try one change
 
@@ -93,6 +95,7 @@ This public version keeps the general workflow and removes the private research 
 
 - The demo covers one descriptive table and two linear regression tables. It isn't a universal manuscript generator.
 - A clean run confirms the code executed as written, not that the design or model choices are sound.
+- The synthetic design clusters standard errors on just 8 clusters, which illustrates the mechanics but is too few for defensible inference. Treat the model setup as a placeholder, not a template.
 - The output is tables only. Numbers typed into manuscript prose can still go stale.
 - Formatting follows a generic style; check it against your target journal.
 

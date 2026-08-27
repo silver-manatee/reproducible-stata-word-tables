@@ -32,7 +32,7 @@ Running `do/master.do` rebuilds:
 
 All values are synthetic.
 
-Each run regenerates `data/synthetic_study.dta` in place, so git shows the file as modified afterward. The data values are unchanged, but the rewritten file is not byte-identical: Stata's save timestamp and some internal padding bytes shift between runs, so a checksum will differ. The Word document behaves the same way, with identical content and changing internal timestamps. This project reproduces numbers, not checksums.
+Each run regenerates `data/synthetic_study.dta` in place, so git shows the file as modified afterward. The values never change, but Stata rewrites its save timestamp and some internal padding bytes each time, so the checksum does change. The same goes for the Word document, where the content stays identical but internal timestamps move. This project reproduces numbers, not checksums.
 
 ## Requirements
 
@@ -55,7 +55,7 @@ Before you run it in a live session, know that the file starts with `clear all`,
 
 When the run finishes, open `output/stata_word_tables.docx`. The Results window should end with `REPORT BUILD COMPLETE.`
 
-Running Stata from a shell instead of the GUI? The exact batch command appears in [docs/verification.md](docs/verification.md). In batch mode there is no Results window; the `REPORT BUILD COMPLETE.` line appears at the end of `master.log`, which Stata writes to the repository root (git ignores it).
+Running Stata from a shell instead of the GUI? [docs/verification.md](docs/verification.md) gives the exact batch command. Batch mode has no Results window, so look for the `REPORT BUILD COMPLETE.` line at the end of `master.log` instead. Stata writes that log to the repository root, and git ignores it.
 
 ## Try one change
 
@@ -95,7 +95,7 @@ This public version keeps the general workflow and removes the private research 
 
 - The demo covers one descriptive table and two linear regression tables. It isn't a universal manuscript generator.
 - A clean run confirms the code executed as written, not that the design or model choices are sound.
-- The synthetic design clusters standard errors on just 8 clusters, which illustrates the mechanics but is too few for defensible inference. Treat the model setup as a placeholder, not a template.
+- Both regression models cluster standard errors on just 8 clusters. That's enough to demonstrate the machinery and far too few for defensible inference, so don't copy the model setup into real work.
 - The output is tables only. Numbers typed into manuscript prose can still go stale.
 - Formatting follows a generic style; check it against your target journal.
 
